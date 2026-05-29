@@ -182,7 +182,6 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
       // and the filter did not match any elements!
       return null
     }
-    console.log("NODES", nodes)
 
     return (
       <form
