@@ -6,7 +6,8 @@ on:
   push:
     branches:
       - develop
-      - ja-iss-16-manifest-listing # remove after confirming this works
+      - ja-iss-16-manifest-listing
+      - ja-iss-17-update-theme-branding
 permissions:
   id-token: write
 jobs:
