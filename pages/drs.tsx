@@ -2,23 +2,27 @@ import type { NextPage } from 'next'
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import AppLayout from 'components/layout/AppLayout';
-import PassportTokenDisplay from 'components/passport/PassportTokenDisplay';
+import DrsManifestTable from 'components/drs/DrsManifestTable';
+import { Dataset, PassportVisaAssertionStatus } from './datasets';
 import { useEnv } from '@/context/EnvContext'
 
-const Passport: NextPage = () => {
-  const env = useEnv()
+const DRS: NextPage = () => {
+  const env = useEnv();
   const router = useRouter();
   const { code, state } = router.query;
   const [isProcessingExchange, setIsProcessingExchange] = useState(false);
   const [flowComplete, setFlowComplete] = useState(false);
+  const [approvedDatasetMap, setApprovedDatasetMap] = useState<Record<string, Dataset>>({});
+  const [selectedDatasetId, setSelectedDatasetId] = useState<string>("");
 
+  // complete OAuth flow to get "Passport" JWT
   useEffect(() => {
     // Wait for Next.js router to fully parse query parameters on mount
     if (!router.isReady) return;
 
     if (flowComplete) {
-      console.log("Token already present. Escaping loop to Passport Page.");
-      router.push('/passport');
+      console.log("Token already present. Escaping loop to DRS Page.");
+      router.push('/drs');
       return;
     }
 
@@ -34,7 +38,7 @@ const Passport: NextPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           code,
-          redirect_uri: `${env.UI_BASE_URL}/passport`
+          redirect_uri: `${env.UI_BASE_URL}/drs`
         })
       })
       .then((res) => res.json())
@@ -42,7 +46,7 @@ const Passport: NextPage = () => {
         if (data.success) {
           // Token is saved securely as an HttpOnly cookie via the server handler
           setFlowComplete(true);
-          router.push('/passport');
+          router.push('/drs');
         } else {
           console.error("Token swap failed:", data.details);
         }
@@ -60,7 +64,7 @@ const Passport: NextPage = () => {
       hydraAuthUrl.searchParams.append('client_id', `${env.HYDRA_RESEARCHER_CLIENT_ID}`);
       hydraAuthUrl.searchParams.append('response_type', 'code');
       hydraAuthUrl.searchParams.append('scope', 'openid offline_access profile');
-      hydraAuthUrl.searchParams.append('redirect_uri', `${env.UI_BASE_URL}/passport`);
+      hydraAuthUrl.searchParams.append('redirect_uri', `${env.UI_BASE_URL}/drs`);
       hydraAuthUrl.searchParams.append('state', (state as string) || crypto.randomUUID());
 
       // Transfer window execution entirely out of Next.js state engine
@@ -68,15 +72,58 @@ const Passport: NextPage = () => {
     }
   }, [router.isReady, code, state]);
 
+  // fetch datasets from API using user's Ory Session Token
+  useEffect(() => {
+      // fetch datasets from API
+      const fetchDatasets = async () => {
+        try {
+          const response = await fetch('/api/datasets');
+  
+          if (!response.ok) {
+            throw new Error('datasets API response was not ok');
+          }
+  
+          const result = await response.json()
+          const resultFiltered = result.filter((dataset:Dataset) => dataset.visa.assertion.currentStatus === "Approved" )
+          const newApprovedDatasetMap = Object.fromEntries(
+            resultFiltered.map((dataset: Dataset) => [dataset.id, dataset]))
+          setApprovedDatasetMap(newApprovedDatasetMap);
+  
+        } catch (error) {
+          console.error('Failed to fetch datasets', error);
+        }
+      }
+  
+      fetchDatasets();
+    }, [])
+
   return (
     <>
       <AppLayout>
-        <h1 className="mb-5 text-5xl font-bold">View Passport Token</h1>
-        <h2 className="mb-4 text-2xl">Use your passport token to access data via GA4GH APIs</h2>
-        {flowComplete ? <PassportTokenDisplay/> : <h2 className="mb-4 text-2xl">Preparing passport token</h2>}
+        <h1 className="mb-5 text-5xl font-bold">Data Repository Service (DRS)</h1>
+        <h2 className="mb-4 text-2xl">View & Inspect DRS Objects</h2>
+        {flowComplete ? (
+          <>
+            <select className="select select-bordered w-full max-w-xs" onChange={e => setSelectedDatasetId(e.target.value)}>
+              <option disabled selected>Select Dataset</option>
+              {(Object.keys(approvedDatasetMap) as Array<keyof Dataset>).map((datasetId) => (
+                <option key={datasetId} value={datasetId}>{approvedDatasetMap[datasetId].name}</option>
+              ))}
+            </select>
+            {selectedDatasetId !== "" ? (
+              <DrsManifestTable
+                selectedDatasetId={selectedDatasetId}
+              />
+            ) : (
+              null
+            )}
+          </>
+        ) : (
+          <h2 className="mb-4 text-2xl">Preparing passport token</h2>
+        )}
       </AppLayout>
     </>
   )
 }
 
-export default Passport
+export default DRS;
