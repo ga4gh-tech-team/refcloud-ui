@@ -8,6 +8,7 @@ on:
       - develop
       - ja-iss-16-manifest-listing
       - ja-iss-17-update-theme-branding
+      - jt-iss-23-align-css-styles
 permissions:
   id-token: write
 jobs:
