@@ -1,23 +1,42 @@
 import type { NextPage } from 'next'
+import { useEnv } from '@/context/EnvContext'
+import Link from 'next/link'
 
 const HomeLoggedOut: NextPage = () => {
+  const env = useEnv()
+
   return (
     <div>
-      <div
-        className="hero min-h-screen"
-        style={{
-          backgroundImage: "url(https://img.daisyui.com/images/stock/photo-1507358522600-9f71e620c44e.webp)",
-        }}>
-        <div className="hero-overlay bg-opacity-60"></div>
-        <div className="hero-content text-neutral-content text-center">
-          <div className="max-w-md">
-            <h1 className="mb-5 text-5xl font-bold">Welcome to the GA4GH Reference Cloud</h1>
-            <div className="flex w-full flex-col">
-              <div className="divider" />
-            </div>
-            <p>Already registered? <a className="link link-secondary" href="/login">Log in</a></p>
-            <p>New user? <a className="link link-secondary" href="/registration">Sign up</a></p>
-            <p>Want to learn more about the platform? <a className="link link-secondary" href={process.env.NEXT_PUBLIC_REFCLOUD_DOCS_URL}>View docs</a></p>
+      <div className="hero min-h-screen">
+        <div className="ga4gh-hero-bg"></div>
+        <div className="hero-overlay bg-[#363636]/60"></div>
+        <div className="hero-content text-neutral-content justify-center items-stretch gap-x-12">
+          <div className="f-logo max-w-md">
+            <img
+              src="https://www.ga4gh.org/wp-content/themes/ga4gh/dist/assets/svg/logos/logo-mark-color.svg"
+              alt="The Global Alliance for Genomics and Health"
+              width="100"
+              height="100"
+            />
+            <h1 className="text-3xl font-bold text-white">Welcome to the GA4GH Reference Cloud</h1>
+          </div>
+          <div className="grid grid-cols-[auto_auto] content-between items-center gap-x-4 w-fit">
+            <span className="text-right text-lg">Already registered?</span>
+            <Link href="/login">
+              <span className="ga4gh-btn-light">
+                <span className="btn-text">Log in</span>
+              </span>
+            </Link>
+            <span className="text-right text-lg">New user?</span>
+            <Link href="/registration">
+              <span className="ga4gh-btn-light">
+                <span className="btn-text">Sign up</span>
+              </span>
+            </Link>
+            <span className="text-right text-lg">Want to learn more about the platform?</span>
+            <a className="ga4gh-btn-light" href={env.REFCLOUD_DOCS_URL}>
+              <span className="btn-text">View docs</span>
+            </a>
           </div>
         </div>
       </div>
