@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { LogoutLink } from "../../pkg"
 import Link from 'next/link';
