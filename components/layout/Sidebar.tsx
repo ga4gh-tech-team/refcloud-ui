@@ -2,7 +2,7 @@
 import React from 'react';
 import { LogoutLink } from "../../pkg"
 import Link from 'next/link';
-import { useEnv } from '@/context/EnvContext';
+import { useEnv } from '@/components/context/EnvContext';
 
 const Sidebar = () => {
   const onLogout = LogoutLink()
