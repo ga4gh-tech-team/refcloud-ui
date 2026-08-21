@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const Navbar = () => {
   return (
-    <div className="navbar bg-base-100 text-base-content box-shadow-base sticky top-0 z-[1000]">
+    <div className="navbar bg-base-100 text-base-content box-shadow-base sticky top-0 z-1000">
       <Link href="/datasets">
         <span className="btn btn-ghost text-2xl no-animation">
           <img

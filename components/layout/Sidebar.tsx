@@ -9,7 +9,7 @@ const Sidebar = () => {
   const env = useEnv()
 
   return (
-    <aside className="w-fit min-w-56 px-2 flex-shrink-0 bg-base-200 text-base-content border-r border-base-300 p-4">
+    <aside className="w-fit min-w-56 px-2 shrink-0 bg-base-200 text-base-content border-r border-base-300 p-4">
         <ul className="anchor-menu-list menu bg-base-200 text-base-content min-h-full w-fit min-w-56 px-2">
           <li><h3 className="menu-title">Data Access</h3></li>
           <li><Link href="/datasets"><span className="anchor-menu-link">Browse Datasets</span></Link></li>
